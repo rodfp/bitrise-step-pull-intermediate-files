@@ -1,0 +1,8 @@
+_tmp
+_artifact_pull
+.gows*
+.bitrise*
+.idea
+.vscode
+README.md.backup
+.DS_Store
