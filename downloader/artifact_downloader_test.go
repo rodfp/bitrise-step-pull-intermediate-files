@@ -81,7 +81,7 @@ func Test_DownloadAndSaveArtifacts_DownloadFails(t *testing.T) {
 	_ = os.RemoveAll(targetDir)
 }
 
-func Test_DownloadAndSaveDirectoryArtifacts(t *testing.T) {
+func Test_DownloadAndSaveZipDirectoryArtifacts(t *testing.T) {
 	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, _ = fmt.Fprint(w, "dummy data")
 	}))
@@ -108,10 +108,54 @@ func Test_DownloadAndSaveDirectoryArtifacts(t *testing.T) {
 	}
 
 	cmd := new(mocks.Command)
-	cmd.On("Run").Return(nil).Once()
+	cmd.On("RunAndReturnTrimmedCombinedOutput").Return("", nil).Once()
 
 	cmdFactory := new(mocks.Factory)
-	cmdFactory.On("Create", "tar", []string{"-x", "-f", "-"}, mock.Anything).Return(cmd).Once()
+	cmdFactory.On("Create", "unzip", mock.Anything, mock.Anything).Return(cmd).Once()
+
+	artifactDownloader := NewConcurrentArtifactDownloader(5*time.Minute, log.NewLogger(), cmdFactory)
+
+	downloadResults, err := artifactDownloader.DownloadAndSaveArtifacts(artifacts, targetDir)
+
+	assert.NoError(t, err)
+	assert.ElementsMatch(t, expectedDownloadResults, downloadResults)
+	cmd.AssertExpectations(t)
+	cmdFactory.AssertExpectations(t)
+
+	_ = os.RemoveAll(targetDir)
+}
+
+func Test_DownloadAndSaveTarDirectoryArtifacts(t *testing.T) {
+	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprint(w, "dummy data")
+	}))
+	defer svr.Close()
+
+	targetDir, err := getDownloadDir(relativeDownloadPath)
+	assert.NoError(t, err)
+
+	downloadURL := fmt.Sprintf(svr.URL + "/1.tar")
+	artifacts := []api.ArtifactResponseItemModel{
+		{
+			DownloadURL: downloadURL,
+			Title:       "1.tar",
+			IntermediateFileInfo: api.IntermediateFileInfo{
+				IsDir: true,
+			},
+		},
+	}
+	expectedDownloadResults := []ArtifactDownloadResult{
+		{
+			DownloadPath: targetDir + "/1",
+			DownloadURL:  downloadURL,
+		},
+	}
+
+	cmd := new(mocks.Command)
+	cmd.On("RunAndReturnTrimmedCombinedOutput").Return("", nil).Once()
+
+	cmdFactory := new(mocks.Factory)
+	cmdFactory.On("Create", "tar", mock.Anything, mock.Anything).Return(cmd).Once()
 
 	artifactDownloader := NewConcurrentArtifactDownloader(5*time.Minute, log.NewLogger(), cmdFactory)
 

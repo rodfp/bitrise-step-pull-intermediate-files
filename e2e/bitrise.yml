@@ -6,54 +6,51 @@ app:
   # Shared envs for every test workflow
   - BITRISEIO_FINISHED_STAGES: |-
         [{
-            "id": "730fde2f-669d-4ed3-9d0c-49fb1e62cbb4",
-            "name": "stage-1-new",
+            "id": "b3562352-8be1-404b-bd80-464e8528dc7b",
+            "name": "stage-1",
             "workflows": [{
                 "credit_cost": 2,
-                "external_id": "0f8ec208-6496-470c-9c5b-dacd8bdd8b01",
-                "finished_at": "2022-10-12T23:27:19Z",
-                "id": "3dceca00-535e-4bf5-bc40-48815ca79ed9",
+                "external_id": "65aad896-2c52-4947-8781-26c1210043ac",
+                "finished_at": "2022-11-25T08:40:09Z",
+                "id": "076fb94d-6f1d-44f2-9e92-cbc9c73812a3",
                 "name": "placeholder",
-                "started_at": "2022-10-12T23:27:18Z",
+                "started_at": "2022-11-25T08:40:07Z",
                 "status": "succeeded"
-            },
-            {
+            }, {
                 "credit_cost": 2,
-                "external_id": "ba1c7066-a7a1-43cf-87ba-34f104e4b846",
-                "finished_at": "2022-10-12T23:27:29Z",
-                "id": "3590eaf3-a1da-44cd-b63d-69fa0a8e8615",
-                "name": "textfile_generator-new",
-                "started_at": "2022-10-12T23:27:19Z",
+                "external_id": "646b36c3-324b-4f08-a607-a491ecf041e9",
+                "finished_at": "2022-11-25T08:40:17Z",
+                "id": "70642fc8-cc2c-4809-8a95-f10a893625f8",
+                "name": "textfile_generator",
+                "started_at": "2022-11-25T08:40:06Z",
                 "status": "succeeded"
             }]
         }, {
-            "id": "747fed17-bc9f-4dff-ac8a-974f8f80e55c",
-            "name": "stage-2-new",
+            "id": "d11e8056-6d00-4ad7-9cfe-a4cd304e2800",
+            "name": "stage-2",
             "workflows": [{
                 "credit_cost": null,
-                "external_id": "87e08554-a47a-4690-9a19-5525a00d2276",
-                "finished_at": "2022-10-12T23:27:52Z",
-                "id": "7b079fd0-c41f-4ab4-bc3c-0e023d800858",
-                "name": "deployer-new",
-                "started_at": "2022-10-12T23:27:34Z",
+                "external_id": "71fbb643-8237-4d55-abf8-2eef1553e0c9",
+                "finished_at": "2022-11-25T08:40:38Z",
+                "id": "5c36785b-ccba-4c87-a96d-9162d22149fa",
+                "name": "deployer",
+                "started_at": "2022-11-25T08:40:20Z",
                 "status": "succeeded"
-            },
-            {
+            }, {
                 "credit_cost": 2,
-                "external_id": "0d4f0389-c985-4f74-85cc-3ad5a6ef46b9",
-                "finished_at": "2022-10-12T23:27:47Z",
-                "id": "1bb2b686-2096-4308-9851-b6a1a846fcda",
-                "name": "textfile_generator-new",
-                "started_at": "2022-10-12T23:27:37Z",
+                "external_id": "e0c99fa6-ffe1-4b5d-8b74-498c0b791c6e",
+                "finished_at": "2022-11-25T08:40:36Z",
+                "id": "290f54ba-d8d5-417e-9a9b-b723a3c5132e",
+                "name": "zip_archive_generator",
+                "started_at": "2022-11-25T08:40:22Z",
                 "status": "succeeded"
-            },
-            {
-                "credit_cost": 2,
-                "external_id": "4378c148-77f0-4b2c-ab25-054664569b16",
-                "finished_at": "2022-10-12T23:27:42Z",
-                "id": "5c991fc2-c009-4838-88b9-172e19fc6b98",
-                "name": "archive_generator",
-                "started_at": "2022-10-12T23:27:32Z",
+            }, {
+                "credit_cost": null,
+                "external_id": "db1be3dd-167c-440c-b87e-93e2f0cee445",
+                "finished_at": "2022-11-25T08:40:37Z",
+                "id": "c7d9adab-9378-49b5-b370-2358d490be30",
+                "name": "tar_archive_generator",
+                "started_at": "2022-11-25T08:40:22Z",
                 "status": "succeeded"
             }]
         }]
@@ -61,6 +58,73 @@ app:
   - BITRISE_AUTH_SERVICE_ARTIFACT_PULL_CLIENT_SECRET: $BITRISE_AUTH_SERVICE_ARTIFACT_PULL_CLIENT_SECRET
 
 workflows:
+  test_download_tar_archive:
+    before_run:
+    - _setup
+    - _cleanup
+    steps:
+    - path::./:
+        title: Execute step
+        inputs:
+        - verbose: true
+        - artifact_sources: stage-2\.tar_archive_generator
+        - bitrise_api_base_url: https://api.bitrise.io
+    - git::https://github.com/bitrise-steplib/bitrise-step-check-step-outputs.git@main:
+        title: Validate downloaded artifacts
+        is_always_run: true
+        inputs:
+        - files: |-
+            ARCHIVE_LAYOUT
+        - dirs: |-
+            ARCHIVE_TAR
+    - script:
+        inputs:
+        - content: |-
+            #!/bin/env bash
+            set -ex
+            cd $ARCHIVE_TAR
+            actual=$(tree -L 1 .)
+            expected=$(cat $ARCHIVE_LAYOUT)
+            if [ "$actual" != "$expected" ]; then
+              echo "actual:\n$actual"
+              echo
+              echo "expected:\n$expected"
+              exit 1
+            fi
+
+  test_download_zip_archive:
+    before_run:
+    - _setup
+    - _cleanup
+    steps:
+    - path::./:
+        title: Execute step
+        inputs:
+        - verbose: true
+        - artifact_sources: stage-2\.zip_archive_generator
+        - bitrise_api_base_url: https://api.bitrise.io
+    - git::https://github.com/bitrise-steplib/bitrise-step-check-step-outputs.git@main:
+        title: Validate downloaded artifacts
+        is_always_run: true
+        inputs:
+        - files: |-
+            ARCHIVE_LAYOUT
+        - dirs: |-
+            ARCHIVE_ZIP
+    - script:
+        inputs:
+        - content: |-
+            #!/bin/env bash
+            set -ex
+            cd $ARCHIVE_ZIP
+            actual=$(tree -L 1 .)
+            expected=$(cat $ARCHIVE_LAYOUT)
+            if [ "$actual" != "$expected" ]; then
+              echo "actual:\n$actual"
+              echo
+              echo "expected:\n$expected"
+              exit 1
+            fi
 
   test_download_all_artifacts_of_build:
     before_run:
@@ -83,7 +147,7 @@ workflows:
             TEST_JSON
             TEXT_FILE_TXT
         - dirs: |-
-            ARCHIVE_TAR
+            ARCHIVE_ZIP
 
   test_download_specific_stage_artifacts:
     before_run:
@@ -94,7 +158,7 @@ workflows:
         title: Execute step
         inputs:
         - verbose: true
-        - artifact_sources: stage-1-new\..*
+        - artifact_sources: stage-1\..*
         - bitrise_api_base_url: https://api.bitrise.io
     - git::https://github.com/bitrise-steplib/bitrise-step-check-step-outputs.git@main:
         title: Validate downloaded artifacts
@@ -130,7 +194,7 @@ workflows:
                 --data "client_secret=$BITRISE_AUTH_SERVICE_ARTIFACT_PULL_CLIENT_SECRET" \
                 --data "grant_type=urn:ietf:params:oauth:grant-type:uma-ticket" \
                 --data "scope=build_artifact:read build:read app:read" \
-                --data "claim_token=ewogICJidWlsZF9pZHMiOiBbCiAgICAiMGY4ZWMyMDgtNjQ5Ni00NzBjLTljNWItZGFjZDhiZGQ4YjAxIiwKICAgICJiYTFjNzA2Ni1hN2ExLTQzY2YtODdiYS0zNGYxMDRlNGI4NDYiLAogICAgIjg3ZTA4NTU0LWE0N2EtNDY5MC05YTE5LTU1MjVhMDBkMjI3NiIsCiAgICAiMGQ0ZjAzODktYzk4NS00Zjc0LTg1Y2MtM2FkNWE2ZWY0NmI5IiwKICAgICI0Mzc4YzE0OC03N2YwLTRiMmMtYWIyNS0wNTQ2NjQ1NjliMTYiCiAgXSwKICAicGlwZWxpbmVfaWQiOiBbCiAgICAiNWI5MTY1OTAtM2U4Zi00MTE5LTk1M2EtN2IzYzFmNmU0NGQ3IgogIF0KfQ==" \
+                --data "claim_token=ewogICJidWlsZF9pZHMiOiBbCiAgICAiNjVhYWQ4OTYtMmM1Mi00OTQ3LTg3ODEtMjZjMTIxMDA0M2FjIiwKICAgICI2NDZiMzZjMy0zMjRiLTRmMDgtYTYwNy1hNDkxZWNmMDQxZTkiLAogICAgIjcxZmJiNjQzLTgyMzctNGQ1NS1hYmY4LTJlZWYxNTUzZTBjOSIsCiAgICAiZTBjOTlmYTYtZmZlMS00YjVkLThiNzQtNDk4YzBiNzkxYzZlIiwKICAgICJkYjFiZTNkZC0xNjdjLTQ0MGMtYjg3ZS05M2UyZjBjZWU0NDUiCiAgXSwKICAicGlwZWxpbmVfaWQiOiBbCiAgICAiMTZlZTg4MGQtYjBlNS00ZTAxLWE4NzYtNDMzOTk1YWQ2N2MxIgogIF0KfQo=" \
                 --data "claim_token_format=urn:ietf:params:oauth:token-type:jwt" \
                 --data "audience=bitrise-api")
 
