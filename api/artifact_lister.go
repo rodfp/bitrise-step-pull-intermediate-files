@@ -77,6 +77,7 @@ func (lister ArtifactLister) ListIntermediateFileDetails(appSlug string, buildSl
 	for i := 1; i <= len(buildSlugs); i++ {
 		res := <-listResults
 		if res.err != nil {
+			lister.logger.Warnf("Failed to list artifacts for build %s: %s", res.buildSlug, res.err)
 			failedBuildSlugs = append(failedBuildSlugs, res.buildSlug)
 		} else {
 			artifacts = append(artifacts, res.artifacts...)
@@ -93,6 +94,11 @@ func (lister ArtifactLister) ListIntermediateFileDetails(appSlug string, buildSl
 // listArtifactsWorker gets details of all artifacts of a particular build using the Bitrise API
 func (lister ArtifactLister) listArtifactsWorker(appSlug string, buildSlugs chan string, results chan listArtifactsResult) {
 	for buildSlug := range buildSlugs {
+		if buildSlug == "" {
+			lister.logger.Warnf("Build slug is empty")
+			// Continue because the results channel is expected to have len(buildSlugs) items. Error will be handled later.
+		}
+
 		lister.logger.Debugf("Listing artifacts for build: https://app.bitrise.io/build/%v", buildSlug)
 		artifactListItems, err := lister.apiClient.ListBuildArtifacts(appSlug, buildSlug)
 		if err != nil {
