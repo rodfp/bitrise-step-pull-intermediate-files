@@ -5,55 +5,55 @@ app:
   envs:
   # Shared envs for every test workflow
   - BITRISEIO_FINISHED_STAGES: |-
-        [{
-            "id": "b3562352-8be1-404b-bd80-464e8528dc7b",
-            "name": "stage-1",
-            "workflows": [{
-                "credit_cost": 2,
-                "external_id": "65aad896-2c52-4947-8781-26c1210043ac",
-                "finished_at": "2022-11-25T08:40:09Z",
-                "id": "076fb94d-6f1d-44f2-9e92-cbc9c73812a3",
-                "name": "placeholder",
-                "started_at": "2022-11-25T08:40:07Z",
-                "status": "succeeded"
-            }, {
-                "credit_cost": 2,
-                "external_id": "646b36c3-324b-4f08-a607-a491ecf041e9",
-                "finished_at": "2022-11-25T08:40:17Z",
-                "id": "70642fc8-cc2c-4809-8a95-f10a893625f8",
-                "name": "textfile_generator",
-                "started_at": "2022-11-25T08:40:06Z",
-                "status": "succeeded"
-            }]
-        }, {
-            "id": "d11e8056-6d00-4ad7-9cfe-a4cd304e2800",
-            "name": "stage-2",
-            "workflows": [{
-                "credit_cost": null,
-                "external_id": "71fbb643-8237-4d55-abf8-2eef1553e0c9",
-                "finished_at": "2022-11-25T08:40:38Z",
-                "id": "5c36785b-ccba-4c87-a96d-9162d22149fa",
-                "name": "deployer",
-                "started_at": "2022-11-25T08:40:20Z",
-                "status": "succeeded"
-            }, {
-                "credit_cost": 2,
-                "external_id": "e0c99fa6-ffe1-4b5d-8b74-498c0b791c6e",
-                "finished_at": "2022-11-25T08:40:36Z",
-                "id": "290f54ba-d8d5-417e-9a9b-b723a3c5132e",
-                "name": "zip_archive_generator",
-                "started_at": "2022-11-25T08:40:22Z",
-                "status": "succeeded"
-            }, {
-                "credit_cost": null,
-                "external_id": "db1be3dd-167c-440c-b87e-93e2f0cee445",
-                "finished_at": "2022-11-25T08:40:37Z",
-                "id": "c7d9adab-9378-49b5-b370-2358d490be30",
-                "name": "tar_archive_generator",
-                "started_at": "2022-11-25T08:40:22Z",
-                "status": "succeeded"
-            }]
-        }]
+      [{
+          "id": "ea0c53ce-25e4-41f8-a3ab-8466cdb3f75b",
+          "name": "stage-1",
+          "workflows": [{
+              "credit_cost": 2,
+              "external_id": "c07c4fb1-631d-471a-bfa7-44b32e62b6ec",
+              "finished_at": "2023-02-16T08:35:34Z",
+              "id": "3ae1a7ab-e263-4619-9f10-9446665933bd",
+              "name": "placeholder",
+              "started_at": "2023-02-16T08:35:21Z",
+              "status": "succeeded"
+          }, {
+              "credit_cost": 2,
+              "external_id": "0fb57a0d-5b8b-4da5-86fa-4d3fd9a168b3",
+              "finished_at": "2023-02-16T08:35:48Z",
+              "id": "4e9e5e87-5acd-4137-a489-de0b727ba4c7",
+              "name": "textfile_generator",
+              "started_at": "2023-02-16T08:35:20Z",
+              "status": "succeeded"
+          }]
+      }, {
+          "id": "37a14bc4-1416-4402-b853-2b25bfa351a7",
+          "name": "stage-2",
+          "workflows": [{
+              "credit_cost": null,
+              "external_id": "2d16d16c-931e-4ef8-83b1-7679fe045836",
+              "finished_at": "2023-02-16T08:36:23Z",
+              "id": "27f1cbf6-f005-4909-80c2-32da286b5bd8",
+              "name": "deployer",
+              "started_at": "2023-02-16T08:35:52Z",
+              "status": "succeeded"
+          }, {
+              "credit_cost": 2,
+              "external_id": "5fede64d-9c4e-4f2f-87c5-168131292876",
+              "finished_at": "2023-02-16T08:36:16Z",
+              "id": "3cf4eb11-64e6-4e86-9aff-dc58105f2b25",
+              "name": "zip_archive_generator",
+              "started_at": "2023-02-16T08:35:53Z",
+              "status": "succeeded"
+          }, {
+              "credit_cost": 2,
+              "external_id": "76827c10-5d95-4c08-ae18-8a63c988b37c",
+              "finished_at": "2023-02-16T08:36:19Z",
+              "id": "46318238-4326-4b85-9bd9-059c9a7e6d81",
+              "name": "tar_archive_generator",
+              "started_at": "2023-02-16T08:35:53Z",
+              "status": "succeeded"
+          }]
+      }]
   - BITRISE_APP_SLUG: b520099804d7e71a
   - BITRISE_AUTH_SERVICE_ARTIFACT_PULL_CLIENT_SECRET: $BITRISE_AUTH_SERVICE_ARTIFACT_PULL_CLIENT_SECRET
 
@@ -83,7 +83,7 @@ workflows:
             #!/bin/env bash
             set -ex
             cd $ARCHIVE_TAR
-            actual=$(tree -L 1 .)
+            actual=$(tree -L 1 --noreport .)
             expected=$(cat $ARCHIVE_LAYOUT)
             if [ "$actual" != "$expected" ]; then
               echo "actual:\n$actual"
@@ -117,7 +117,7 @@ workflows:
             #!/bin/env bash
             set -ex
             cd $ARCHIVE_ZIP
-            actual=$(tree -L 1 .)
+            actual=$(tree -L 1 --noreport .)
             expected=$(cat $ARCHIVE_LAYOUT)
             if [ "$actual" != "$expected" ]; then
               echo "actual:\n$actual"
@@ -194,7 +194,7 @@ workflows:
                 --data "client_secret=$BITRISE_AUTH_SERVICE_ARTIFACT_PULL_CLIENT_SECRET" \
                 --data "grant_type=urn:ietf:params:oauth:grant-type:uma-ticket" \
                 --data "scope=build_artifact:read build:read app:read" \
-                --data "claim_token=ewogICJidWlsZF9pZHMiOiBbCiAgICAiNjVhYWQ4OTYtMmM1Mi00OTQ3LTg3ODEtMjZjMTIxMDA0M2FjIiwKICAgICI2NDZiMzZjMy0zMjRiLTRmMDgtYTYwNy1hNDkxZWNmMDQxZTkiLAogICAgIjcxZmJiNjQzLTgyMzctNGQ1NS1hYmY4LTJlZWYxNTUzZTBjOSIsCiAgICAiZTBjOTlmYTYtZmZlMS00YjVkLThiNzQtNDk4YzBiNzkxYzZlIiwKICAgICJkYjFiZTNkZC0xNjdjLTQ0MGMtYjg3ZS05M2UyZjBjZWU0NDUiCiAgXSwKICAicGlwZWxpbmVfaWQiOiBbCiAgICAiMTZlZTg4MGQtYjBlNS00ZTAxLWE4NzYtNDMzOTk1YWQ2N2MxIgogIF0KfQo=" \
+                --data "claim_token=ewogICJidWlsZF9pZHMiOiBbCiAgICAiYzA3YzRmYjEtNjMxZC00NzFhLWJmYTctNDRiMzJlNjJiNmVjIiwKICAgICIwZmI1N2EwZC01YjhiLTRkYTUtODZmYS00ZDNmZDlhMTY4YjMiLAogICAgIjJkMTZkMTZjLTkzMWUtNGVmOC04M2IxLTc2NzlmZTA0NTgzNiIsCiAgICAiNWZlZGU2NGQtOWM0ZS00ZjJmLTg3YzUtMTY4MTMxMjkyODc2IiwKICAgICI3NjgyN2MxMC01ZDk1LTRjMDgtYWUxOC04YTYzYzk4OGIzN2MiCiAgXSwKICAicGlwZWxpbmVfaWQiOiBbCiAgICAiNGM4MGVjNzQtMDdjZC00ZmIyLWIxZDEtMDgzMDkzYTNlYTBlIgogIF0KfQo=" \
                 --data "claim_token_format=urn:ietf:params:oauth:token-type:jwt" \
                 --data "audience=bitrise-api")
 

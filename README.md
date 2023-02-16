@@ -58,8 +58,8 @@ Use the `artifact_sources` input variable to limit the downloads to a set of sta
 
 - `stage1.workflow1` - Gets the artifacts from the stage1's workflow1.
 - `stage1\..*` - Gets all artifacts from the stage1's workflows.
-- `.*\.workflow1` - Gets workflow1s' artifacts from all stages.
-- `.*` - Gets every generated artifacts in the pipeline.
+- `.*\.workflow1` - Gets workflow1s' artifacts from the previous stages.
+- `.*` - Gets every generated artifacts from the previous stages.
 
 ##### Wildcard based artifact pull
 
@@ -141,7 +141,7 @@ Do not forget to escape the special characters when using a regex pattern.
 
 | Key | Description | Flags | Default |
 | --- | --- | --- | --- |
-| `artifact_sources` | A comma (`,`) separated list of the Stage and Workflow paths, used to specify which workflows' artifacts to download.  The input uses a `{stage}.{workflow}` syntax. The dot character (`.`) is the delimiter between the Stage and the Workflow.  You can use regular expressions. The default value (`.*`) means: get every artifact from every Workflow.  Do not forget to escape the special characters. If you want to match all workflow from a stage then you need to escape the `.` separator and the use the `.*` any characters regex like `{stage-name}\..*`. | required | `.*` |
+| `artifact_sources` | A comma (`,`) separated list of the Stage and Workflow paths (`{stage}.{workflow}`), used to specify which workflows' artifacts to download.  The input uses a `{stage}.{workflow}` syntax. The dot character (`.`) is the delimiter between the Stage and the Workflow.  You can use regular expressions. Do not forget to escape the special characters.  Examples: - `stage1.workflow1` - Gets the artifacts from the stage1's workflow1. - `stage1\..*` - Gets all artifacts from the stage1's workflows. - `.*\.workflow1` - Gets workflow1s' artifacts from the previous stages. - `.*` - Gets every generated artifacts from the previous stages. | required | `.*` |
 | `verbose` | Enable logging additional information for debugging | required | `false` |
 | `app_slug` | The slug that uniquely identifies your app on bitrise.io. It’s part of the app URL, too. | required | `$BITRISE_APP_SLUG` |
 | `finished_stage` | This is a JSON representation of the finished stages for which the step can download build artifacts. | required | `$BITRISEIO_FINISHED_STAGES` |

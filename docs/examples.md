@@ -14,8 +14,8 @@ Use the `artifact_sources` input variable to limit the downloads to a set of sta
 
 - `stage1.workflow1` - Gets the artifacts from the stage1's workflow1.
 - `stage1\..*` - Gets all artifacts from the stage1's workflows.
-- `.*\.workflow1` - Gets workflow1s' artifacts from all stages.
-- `.*` - Gets every generated artifacts in the pipeline.
+- `.*\.workflow1` - Gets workflow1s' artifacts from the previous stages.
+- `.*` - Gets every generated artifacts from the previous stages.
 
 ##### Wildcard based artifact pull
 
