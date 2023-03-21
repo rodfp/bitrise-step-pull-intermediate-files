@@ -8,12 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bitrise-io/go-utils/log"
-	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-steplib/bitrise-step-pull-intermediate-files/api"
 	"github.com/bitrise-steplib/bitrise-step-pull-intermediate-files/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/bitrise-io/go-utils/log"
+	"github.com/bitrise-io/go-utils/pathutil"
 )
 
 const relativeDownloadPath = "_tmp"
@@ -121,6 +122,12 @@ func Test_DownloadAndSaveZipDirectoryArtifacts(t *testing.T) {
 	assert.ElementsMatch(t, expectedDownloadResults, downloadResults)
 	cmd.AssertExpectations(t)
 	cmdFactory.AssertExpectations(t)
+	assert.Len(t, cmdFactory.Calls, 1)
+	assert.Len(t, cmdFactory.Calls[0].Arguments, 3)
+	assert.IsType(t, []string{}, cmdFactory.Calls[0].Arguments[1])
+	unzipCmdArguments := cmdFactory.Calls[0].Arguments[1].([]string)
+	assert.Len(t, unzipCmdArguments, 2)
+	assert.Equal(t, "-o", unzipCmdArguments[0])
 
 	_ = os.RemoveAll(targetDir)
 }

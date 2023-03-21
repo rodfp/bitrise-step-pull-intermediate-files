@@ -11,12 +11,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bitrise-steplib/bitrise-step-pull-intermediate-files/api"
+
 	"github.com/bitrise-io/go-utils/command"
 	"github.com/bitrise-io/go-utils/filedownloader"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/retry"
-	"github.com/bitrise-steplib/bitrise-step-pull-intermediate-files/api"
 )
 
 const (
@@ -176,7 +177,7 @@ func (ad *ConcurrentArtifactDownloader) downloadAndExtractTarArchive(targetDir, 
 }
 
 func (ad *ConcurrentArtifactDownloader) extractZipArchive(archivePath string, targetDir string) error {
-	cmd := ad.CommandFactory.Create("unzip", []string{archivePath}, &command.Opts{Dir: targetDir})
+	cmd := ad.CommandFactory.Create("unzip", []string{"-o", archivePath}, &command.Opts{Dir: targetDir})
 	return ad.runExtractionCommand(cmd)
 }
 
